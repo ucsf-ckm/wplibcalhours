@@ -30,7 +30,7 @@ class WpLibCalHours_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
-		delete_transient( 'wplibcalhours' );
+		delete_transient( WpLibCalHours::CACHE_KEY );
 	}
 
 }

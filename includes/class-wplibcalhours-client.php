@@ -23,14 +23,6 @@
 class WpLibCalHours_Client {
 
 	/**
-	 * The expiration value for LibCal data in the transients cache.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var int CACHE_EXPIRATION The expiration value for LibCal data in the transients cache.
-	 */
-	const CACHE_EXPIRATION = 60 * 60 * 4; // 4 hours
-	/**
 	 * The ID of this plugin.
 	 *
 	 * @since    1.0.0
@@ -70,14 +62,13 @@ class WpLibCalHours_Client {
 	 * @since    1.0.0
 	 */
 	public function getHours( $location ) {
-		$transient_name = $this->plugin_name . '_data';
-		$data           = get_transient( $transient_name );
+		$data = get_transient( WpLibCalHours::CACHE_KEY );
 		if ( false === $data ) {
 			$data = $this->fetchHoursFromAPI();
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
-			set_transient( $transient_name, $data, self::CACHE_EXPIRATION );
+			set_transient( WpLibCalHours::CACHE_KEY, $data, WpLibCalHours::CACHE_EXPIRATION );
 		}
 
 		return $this->extractTimetableForLocation( $location, $data );

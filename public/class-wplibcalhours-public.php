@@ -143,12 +143,14 @@ class WpLibCalHours_Public {
 		$return = $this->client->getHours( $attrs['location'] );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
+
 			return '';
 		}
 
 		$return = $this->preprocess_location_hours_for_output( $return['weeks'] );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
+
 			return '';
 		}
 
