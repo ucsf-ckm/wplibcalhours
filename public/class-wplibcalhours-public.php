@@ -154,10 +154,11 @@ class WpLibCalHours_Public {
 			return '';
 		}
 
-		$o = '<table><thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
+		$o = '<table class="wplibcalhours"><thead><tr><th colspan="3">' . __( 'Hours',
+				'wplibcalhours' ) . '</th></tr></thead>';
 		$o .= '<tbody>';
 		foreach ( $return as $day ) {
-			$o .= '<tr><td>' . $day['date']->format( 'l' ) . '</td>';
+			$o .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $day['date']->format( 'l' ) . '</td>';
 			$o .= '<td>' . $day['date']->format( 'M j' ) . '</td>';
 			$o .= '<td>' . $day['text'] . '</td></tr>';
 		}
@@ -218,7 +219,9 @@ class WpLibCalHours_Public {
 		$day_of_the_week = date( 'N', $now );
 		$offset          = $day_of_the_week - 1;
 		$today           = date_create()->setTimestamp( $now );
-		$start_date      = $today->sub( new \DateInterval( "P${offset}D" ) );
+		$start_date      = clone $today;
+
+		$start_date->sub( new \DateInterval( "P${offset}D" ) );
 
 		$filtered_days = array();
 		for ( $i = 0; $i < $num_days; $i ++ ) {
@@ -229,7 +232,8 @@ class WpLibCalHours_Public {
 			if ( array_key_exists( $key, $days ) ) {
 				$filtered_day['text'] = $days[ $key ];
 			}
-			$filtered_days[] = $filtered_day;
+			$filtered_day['is_today'] = $key === $today->format( 'Y-m-d' );
+			$filtered_days[]          = $filtered_day;
 		}
 
 		return $filtered_days;
