@@ -23,6 +23,7 @@
  * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       wplibcalhours
  * Domain Path:       /languages
+ * GitHub Plugin URI: https://github.com/ucsf-ckm/wplibcalhours
  */
 
 // If this file is called directly, abort.
