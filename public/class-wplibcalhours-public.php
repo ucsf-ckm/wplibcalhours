@@ -138,16 +138,17 @@ class WpLibCalHours_Public {
 	public function wplibcalhours_sc( $attrs = array() ) {
 
 		$attrs = array_change_key_case( $attrs, CASE_LOWER );
-		$attrs = shortcode_atts( [ 'location' => '' ], $attrs );
+		$attrs = shortcode_atts( [ 'location' => '', 'start_today' => 'true' ], $attrs );
 
-		$return = $this->client->getHours( $attrs['location'] );
+		$return      = $this->client->getHours( $attrs['location'] );
+		$start_today = filter_var( $attrs['start_today'], FILTER_VALIDATE_BOOLEAN );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
 			return '';
 		}
 
-		$return = $this->preprocess_location_hours_for_output( $return['weeks'] );
+		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $start_today );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
@@ -172,13 +173,18 @@ class WpLibCalHours_Public {
 	 * Extracts and massages opening hours from a given list of opening hours as returned from the API.
 	 *
 	 * @param array $weeks_raw_data An array of nested arrays, each one containing the opening hours for an entire week.
+	 * @param boolean $start_today TRUE if list starts today, FALSE if list starts on Monday of this week.
 	 * @param int $num_days Starting from the beginning of this week, how many days should be returned.
 	 *
 	 * @return array|WP_Error The list of opening hours, keyed off by their date ('YYYY-MM-DD').
 	 *
 	 * @since 1.0.0
 	 */
-	protected function preprocess_location_hours_for_output( array $weeks_raw_data, $num_days = 7 ) {
+	protected function preprocess_location_hours_for_output(
+		array $weeks_raw_data,
+		$start_today = true,
+		$num_days = 7
+	) {
 		if ( empty( $weeks_raw_data ) ) {
 			return new WP_Error( $this->plugin_name . '_empty_data',
 				__( 'Retrieved data is empty.', 'wplibcalhours' )
@@ -214,14 +220,17 @@ class WpLibCalHours_Public {
 			}
 		}
 
-		// calculate the start date (this should always be the Monday of this week).
-		$now             = current_time( 'timestamp' );
-		$day_of_the_week = date( 'N', $now );
-		$offset          = $day_of_the_week - 1;
-		$today           = date_create()->setTimestamp( $now );
-		$start_date      = clone $today;
+		// calculate the start date (this should either be today, or the Monday of this week).
+		$now = current_time( 'timestamp' );
 
-		$start_date->sub( new \DateInterval( "P${offset}D" ) );
+		$today      = date_create()->setTimestamp( $now );
+		$start_date = clone $today;
+
+		if ( ! $start_today ) {
+			$day_of_the_week = date( 'N', $now );
+			$offset          = $day_of_the_week - 1;
+			$start_date->sub( new \DateInterval( "P${offset}D" ) );
+		}
 
 		$filtered_days = array();
 		for ( $i = 0; $i < $num_days; $i ++ ) {
