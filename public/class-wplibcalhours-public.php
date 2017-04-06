@@ -23,6 +23,15 @@
 class WpLibCalHours_Public {
 
 	/**
+	 * The default number of weeks to display.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 * @var int DEFAULT_NUM_WEEKS The default number of weeks to display.
+	 */
+	const DEFAULT_NUM_WEEKS = 3;
+
+	/**
 	 * The ID of this plugin.
 	 *
 	 * @since    1.0.0
@@ -137,33 +146,54 @@ class WpLibCalHours_Public {
 	 */
 	public function wplibcalhours_sc( $attrs = array() ) {
 
-		$attrs = array_change_key_case( $attrs, CASE_LOWER );
-		$attrs = shortcode_atts( [ 'location' => '', 'start_today' => 'true' ], $attrs );
-
-		$return      = $this->client->getHours( $attrs['location'] );
+		$attrs       = array_change_key_case( $attrs, CASE_LOWER );
+		$attrs       = shortcode_atts( [
+			'location'    => '',
+			'start_today' => 'true',
+			'num_weeks'   => self::DEFAULT_NUM_WEEKS
+		], $attrs );
 		$start_today = filter_var( $attrs['start_today'], FILTER_VALIDATE_BOOLEAN );
+		$num_weeks   = (int) $attrs['num_weeks'];
+		if ( $num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS ) {
+			$num_weeks = self::DEFAULT_NUM_WEEKS;
+		}
+		$num_days = $num_weeks * 7;
+
+		$return = $this->client->getHours( $attrs['location'] );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
 			return '';
 		}
 
-		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $start_today );
+		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $start_today, $num_days );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
 			return '';
 		}
 
-		$o = '<table class="wplibcalhours"><thead><tr><th colspan="3">' . __( 'Hours',
-				'wplibcalhours' ) . '</th></tr></thead>';
+		$o = '<table class="wplibcalhours">';
+		$o .= '<thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
 		$o .= '<tbody>';
-		foreach ( $return as $day ) {
+		for ( $i = 0, $n = count( $return ); $i < $n; $i ++ ) {
+			$day = $return[ $i ];
+			if ( $i && ! ( $i % 7 ) ) {
+				$o .= '</tbody><tbody class="hidden">';
+			}
 			$o .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $day['date']->format( 'l' ) . '</td>';
 			$o .= '<td>' . $day['date']->format( 'M j' ) . '</td>';
 			$o .= '<td>' . $day['text'] . '</td></tr>';
 		}
-		$o .= '</tbody></table>';
+		$o .= '</tbody>';
+
+		if ( 1 < $num_weeks ) {
+			$o .= '<tfoot><tr><td colspan="3">';
+			$o .= '<a class="prev hidden">&laquo; ' . __( 'previous', 'wplibcalhours' ) . '</a>';
+			$o .= '<a class="next">' . __( 'next', 'wplibcalhours' ) . ' &raquo;</a>';
+			$o .= '</td></tr></tfoot>';
+		}
+		$o .= '</table>';
 
 
 		return $o;
@@ -199,7 +229,7 @@ class WpLibCalHours_Public {
 		$days = array();
 		foreach ( $all_days_raw as $day_raw ) {
 			if ( array_key_exists( 'times', $day_raw ) && array_key_exists( 'date', $day_raw ) ) {
-				$text = '';
+				$text = __( 'n/a', 'wplibcalhours' );
 				switch ( $day_raw['times']['status'] ) {
 					case '24hours':
 						$text = __( '24 hours', 'wplibcalhours' );
@@ -240,6 +270,8 @@ class WpLibCalHours_Public {
 			$filtered_day = array( 'date' => $date, 'text' => '' );
 			if ( array_key_exists( $key, $days ) ) {
 				$filtered_day['text'] = $days[ $key ];
+			} else {
+				$filtered_day['text'] = __( 'n/a', 'wplibcalhours' );
 			}
 			$filtered_day['is_today'] = $key === $today->format( 'Y-m-d' );
 			$filtered_days[]          = $filtered_day;

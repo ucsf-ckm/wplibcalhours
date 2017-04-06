@@ -1,32 +1,54 @@
-(function( $ ) {
-	'use strict';
+(function ($) {
+    'use strict';
+    $.fn.wplibcalhours = function () {
+        return this.each(function () {
+            var $this = $(this);
+            var weeks = $('tbody', $this);
+            var numWeeks = weeks.length;
+            var counter = 0;
+            var prev = $('.prev', $this);
+            var next = $('.next', $this);
 
-	/**
-	 * All of the code for your public-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+            var updateWeeksDisplay = function () {
+                for (var i = 0; i < numWeeks; i++) {
+                    if (i === counter) {
+                        $(weeks[i]).removeClass('hidden');
+                    } else {
+                        $(weeks[i]).addClass('hidden');
+                    }
+                }
+            };
 
-})( jQuery );
+            var increment = function () {
+                counter++;
+                if (counter) {
+                    prev.removeClass('hidden');
+                }
+                if (counter === (numWeeks - 1)) {
+                    next.addClass('hidden');
+                }
+
+                updateWeeksDisplay();
+            };
+
+            var decrement = function () {
+                counter--;
+                if (!counter) {
+                    prev.addClass('hidden');
+                }
+                if (counter !== numWeeks) {
+                    next.removeClass('hidden');
+                }
+
+                updateWeeksDisplay();
+            };
+
+            prev.on('click', decrement);
+            next.on('click', increment);
+        });
+    };
+
+    $(document).ready(function () {
+        $('.wplibcalhours').wplibcalhours();
+    });
+})(jQuery);
