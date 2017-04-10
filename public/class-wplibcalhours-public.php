@@ -159,7 +159,8 @@ class WpLibCalHours_Public {
 		}
 		$num_days = $num_weeks * 7;
 
-		$return = $this->client->getHours( $attrs['location'] );
+		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
+		$return       = $this->client->getHours( $attrs['location'], $ignore_cache );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 

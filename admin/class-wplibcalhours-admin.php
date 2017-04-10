@@ -156,6 +156,17 @@ class WpLibCalHours_Admin {
 			array( 'label_for' => $option_name )
 		);
 		register_setting( $this->plugin_name, $option_name, 'sanitize_text_field' );
+
+		$option_name = $this->plugin_name . '_ignore_cache';
+		add_settings_field(
+			$option_name,
+			__( 'Ignore Cache', 'wplibcalhours' ),
+			array( $this, $option_name . '_cb' ),
+			$this->plugin_name,
+			$section_name,
+			array( 'label_for' => $option_name )
+		);
+		register_setting( $this->plugin_name, $option_name, 'intval' );
 	}
 
 	/**
@@ -167,6 +178,17 @@ class WpLibCalHours_Admin {
 		$option_name = $this->plugin_name . '_api_url';
 		$url         = get_option( $option_name );
 		echo '<input type="url" class="regular-text" name="' . $option_name . '" id="' . $option_name . '" value="' . esc_attr( $url ) . '"> ';
+	}
+
+	/**
+	 * Render the "Ignore Cache" checkbox field for this plugin.
+	 *
+	 * @since  1.0.0
+	 */
+	public function wplibcalhours_ignore_cache_cb() {
+		$option_name  = $this->plugin_name . '_ignore_cache';
+		$ignore_cache = get_option( $option_name );
+		echo '<input type="checkbox" name="' . $option_name . '" value="1" ' . checked( '1', $ignore_cache, false ) . '/>';
 	}
 
 	/**
@@ -187,5 +209,17 @@ class WpLibCalHours_Admin {
 		array_unshift( $actions, $settings );
 
 		return $actions;
+	}
+
+	/**
+	 * Update option callback on the "Ignore Cache" setting.
+	 * Clears out any LibCal data that may be in the transient cache if this option's value changes.
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/update_option_option/
+	 *
+	 * @since 1.0.0
+	 */
+	public function update_option_ignore_cache() {
+		delete_transient( WpLibCalHours::CACHE_KEY );
 	}
 }

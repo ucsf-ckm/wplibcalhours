@@ -57,18 +57,25 @@ class WpLibCalHours_Client {
 	/**
 	 * Returns the hours from a given location.
 	 *
+	 * @param boolean $ignore_cache Set to TRUE to bypass cache.
+	 *
 	 * @return array|WP_Error
 	 *
 	 * @since    1.0.0
 	 */
-	public function getHours( $location ) {
-		$data = get_transient( WpLibCalHours::CACHE_KEY );
+	public function getHours( $location, $ignore_cache = false ) {
+		$data = false;
+		if ( ! $ignore_cache ) {
+			$data = get_transient( WpLibCalHours::CACHE_KEY );
+		}
 		if ( false === $data ) {
 			$data = $this->fetchHoursFromAPI();
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
-			set_transient( WpLibCalHours::CACHE_KEY, $data, WpLibCalHours::CACHE_EXPIRATION );
+			if ( ! $ignore_cache ) {
+				set_transient( WpLibCalHours::CACHE_KEY, $data, WpLibCalHours::CACHE_EXPIRATION );
+			}
 		}
 
 		return $this->extractTimetableForLocation( $location, $data );
