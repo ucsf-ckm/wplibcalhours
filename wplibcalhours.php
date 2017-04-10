@@ -40,7 +40,6 @@ function deactivate_wplibcalhours() {
 	WpLibCalHours_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_wplibcalhours' );
 register_deactivation_hook( __FILE__, 'deactivate_wplibcalhours' );
 
 /**
