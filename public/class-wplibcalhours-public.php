@@ -149,10 +149,8 @@ class WpLibCalHours_Public {
 		$attrs       = array_change_key_case( $attrs, CASE_LOWER );
 		$attrs       = shortcode_atts( [
 			'location'    => '',
-			'start_today' => 'true',
 			'num_weeks'   => self::DEFAULT_NUM_WEEKS
 		], $attrs );
-		$start_today = filter_var( $attrs['start_today'], FILTER_VALIDATE_BOOLEAN );
 		$num_weeks   = (int) $attrs['num_weeks'];
 		if ( $num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS ) {
 			$num_weeks = self::DEFAULT_NUM_WEEKS;
@@ -167,7 +165,7 @@ class WpLibCalHours_Public {
 			return '';
 		}
 
-		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $start_today, $num_days );
+		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $num_days );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
@@ -204,18 +202,13 @@ class WpLibCalHours_Public {
 	 * Extracts and massages opening hours from a given list of opening hours as returned from the API.
 	 *
 	 * @param array $weeks_raw_data An array of nested arrays, each one containing the opening hours for an entire week.
-	 * @param boolean $start_today TRUE if list starts today, FALSE if list starts on Monday of this week.
 	 * @param int $num_days Starting from the beginning of this week, how many days should be returned.
 	 *
 	 * @return array|WP_Error The list of opening hours, keyed off by their date ('YYYY-MM-DD').
 	 *
 	 * @since 1.0.0
 	 */
-	protected function preprocess_location_hours_for_output(
-		array $weeks_raw_data,
-		$start_today = true,
-		$num_days = 7
-	) {
+	protected function preprocess_location_hours_for_output( array $weeks_raw_data, $num_days = 7 ) {
 		if ( empty( $weeks_raw_data ) ) {
 			return new WP_Error( $this->plugin_name . '_empty_data',
 				__( 'Retrieved data is empty.', 'wplibcalhours' )
@@ -256,12 +249,6 @@ class WpLibCalHours_Public {
 
 		$today      = date_create()->setTimestamp( $now );
 		$start_date = clone $today;
-
-		if ( ! $start_today ) {
-			$day_of_the_week = date( 'N', $now );
-			$offset          = $day_of_the_week - 1;
-			$start_date->sub( new \DateInterval( "P${offset}D" ) );
-		}
 
 		$filtered_days = array();
 		for ( $i = 0; $i < $num_days; $i ++ ) {
