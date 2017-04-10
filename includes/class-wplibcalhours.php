@@ -193,8 +193,6 @@ class WpLibCalHours {
 
 		$plugin_admin = new WpLibCalHours_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_setting' );
 		$this->loader->add_action( 'update_option_' . $this->plugin_name . '_ignore_cache', $plugin_admin, 'update_option_ignore_cache', null, 0 );

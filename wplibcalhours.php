@@ -32,15 +32,6 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-wplibcalhours-activator.php
- */
-function activate_wplibcalhours() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-wplibcalhours-activator.php';
-	WpLibCalHours_Activator::activate();
-}
-
-/**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-wplibcalhours-deactivator.php
  */
