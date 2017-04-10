@@ -57,6 +57,7 @@ class WpLibCalHours_Client {
 	/**
 	 * Returns the hours from a given location.
 	 *
+	 * @param string $location The name of the location.
 	 * @param boolean $ignore_cache Set to TRUE to bypass cache.
 	 *
 	 * @return array|WP_Error
