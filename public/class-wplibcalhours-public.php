@@ -146,12 +146,12 @@ class WpLibCalHours_Public {
 	 */
 	public function wplibcalhours_sc( $attrs = array() ) {
 
-		$attrs       = array_change_key_case( $attrs, CASE_LOWER );
-		$attrs       = shortcode_atts( [
-			'location'    => '',
-			'num_weeks'   => self::DEFAULT_NUM_WEEKS
+		$attrs     = array_change_key_case( $attrs, CASE_LOWER );
+		$attrs     = shortcode_atts( [
+			'location'  => '',
+			'num_weeks' => self::DEFAULT_NUM_WEEKS
 		], $attrs );
-		$num_weeks   = (int) $attrs['num_weeks'];
+		$num_weeks = (int) $attrs['num_weeks'];
 		if ( $num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS ) {
 			$num_weeks = self::DEFAULT_NUM_WEEKS;
 		}

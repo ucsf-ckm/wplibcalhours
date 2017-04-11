@@ -166,6 +166,6 @@ class WpLibCalHours_Admin {
 	 * @since 1.0.0
 	 */
 	public function update_option_ignore_cache() {
-		delete_transient( WpLibCalHours::CACHE_KEY );
+		delete_transient( $this->plugin_name . '_data' );
 	}
 }

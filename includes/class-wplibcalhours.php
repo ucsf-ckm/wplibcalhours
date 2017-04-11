@@ -30,23 +30,6 @@
 class WpLibCalHours {
 
 	/**
-	 * The transient cache key for LibCal hours data.
-	 * @since 1.0.0
-	 * @access public
-	 * @var string CACHE_KEY The transient cache key for LibCal hours data.
-	 */
-	const CACHE_KEY = 'wplibcalhours_data';
-
-	/**
-	 * The expiration value for LibCal data in the transients cache.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var int CACHE_EXPIRATION The expiration value for LibCal data in the transients cache.
-	 */
-	const CACHE_EXPIRATION = 60 * 4; // 4 hours
-
-	/**
 	 * The unique identifier of this plugin.
 	 *
 	 * @since    1.0.0

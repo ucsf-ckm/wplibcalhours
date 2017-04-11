@@ -65,9 +65,10 @@ class WpLibCalHours_Client {
 	 * @since    1.0.0
 	 */
 	public function getHours( $location, $ignore_cache = false ) {
-		$data = false;
+		$data          = false;
+		$transient_key = $this->plugin_name . '_data';
 		if ( ! $ignore_cache ) {
-			$data = get_transient( WpLibCalHours::CACHE_KEY );
+			$data = get_transient( $transient_key );
 		}
 		if ( false === $data ) {
 			$data = $this->fetchHoursFromAPI();
@@ -75,7 +76,8 @@ class WpLibCalHours_Client {
 				return $data;
 			}
 			if ( ! $ignore_cache ) {
-				set_transient( WpLibCalHours::CACHE_KEY, $data, WpLibCalHours::CACHE_EXPIRATION );
+				$transient_timeout = 60 * 4; // 4 hours
+				set_transient( $transient_key, $data, $transient_timeout );
 			}
 		}
 

@@ -30,5 +30,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-delete_transient( 'wplibcalhours' );
-delete_option( 'wplibcalhours_api_endpoint' );
+delete_transient( 'wplibcalhours_data' );
+delete_option( 'wplibcalhours_ignore_cache' );
+delete_option( 'wplibcalhours_api_url' );
