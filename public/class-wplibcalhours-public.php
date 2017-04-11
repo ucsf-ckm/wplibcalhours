@@ -59,8 +59,8 @@ class WpLibCalHours_Public {
 	 *
 	 * @since    1.0.0
 	 *
-	 * @param      string $plugin_name The name of the plugin.
-	 * @param      string $version The version of this plugin.
+	 * @param      string               $plugin_name The name of the plugin.
+	 * @param      string               $version The version of this plugin.
 	 * @param      WpLibCalHours_Client $client The LibCal API client.
 	 */
 	public function __construct( $plugin_name, $version, WpLibCalHours_Client $client ) {
@@ -202,7 +202,7 @@ class WpLibCalHours_Public {
 	 * Extracts and massages opening hours from a given list of opening hours as returned from the API.
 	 *
 	 * @param array $weeks_raw_data An array of nested arrays, each one containing the opening hours for an entire week.
-	 * @param int $num_days Starting from the beginning of this week, how many days should be returned.
+	 * @param int   $num_days Starting from the beginning of this week, how many days should be returned.
 	 *
 	 * @return array|WP_Error The list of opening hours, keyed off by their date ('YYYY-MM-DD').
 	 *

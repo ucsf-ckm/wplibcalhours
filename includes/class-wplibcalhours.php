@@ -143,7 +143,8 @@ class WpLibCalHours {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wplibcalhours-client.php';
 
 		$this->loader = new WpLibCalHours_Loader();
-		$this->client = new WpLibCalHours_Client( self::PLUGIN_NAME, $this->version );
+		$url = get_option( self::PLUGIN_NAME . '_api_url' );
+		$this->client = new WpLibCalHours_Client( self::PLUGIN_NAME, $this->version, $url );
 
 	}
 

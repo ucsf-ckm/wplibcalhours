@@ -41,23 +41,34 @@ class WpLibCalHours_Client {
 	private $version;
 
 	/**
+	 * The API endpoint URL.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var string $url The API endpoint.
+	 */
+	protected $url;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
 	 *
 	 * @param      string $plugin_name The name of this plugin.
 	 * @param      string $version The version of this plugin.
+	 * @param      string $url The API endpoint.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $url ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->url         = $url;
 	}
 
 	/**
 	 * Returns the hours from a given location.
 	 *
-	 * @param string $location The name of the location.
+	 * @param string  $location The name of the location.
 	 * @param boolean $ignore_cache Set to TRUE to bypass cache.
 	 *
 	 * @return array|WP_Error
@@ -84,27 +95,29 @@ class WpLibCalHours_Client {
 		return $this->extractTimetableForLocation( $location, $data );
 	}
 
+	/**
+	 * Fetches hours-data from the LibCal Hours API.
+	 * @since 1.0.0
+	 * @access protected
+	 * @return array|WP_Error The retrieved data or an error.
+	 */
 	protected function fetchHoursFromAPI() {
-		$url = get_option( $this->plugin_name . '_api_url' );
-		if ( '' === trim( $url ) ) {
+
+		if ( '' === trim( $this->url ) ) {
 			return new WP_Error( $this->plugin_name . '_missing_api_url',
 				__( 'No LibCal API endpoint has been configured.', 'wplibcalhours' )
 			);
 		}
-		$response = wp_remote_get( $url );
+		$response = wp_remote_get( $this->url );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
 		$payload = wp_remote_retrieve_body( $response );
-		if ( is_wp_error( $payload ) ) {
-			return $payload;
-		}
-
-		$data = json_decode( $payload, true );
+		$data    = json_decode( $payload, true );
 		if ( false === $data ) {
 			return new WP_Error( $this->plugin_name . '_invalid_json',
 				__( 'Unable to JSON-decode the payload retrieved from API endpoint', 'wplibcalhours' ),
-				array( $url, $payload, json_last_error() )
+				array( $this->url, $payload, json_last_error() )
 			);
 		}
 
@@ -115,7 +128,7 @@ class WpLibCalHours_Client {
 	 * Extracts the hours for a given location from the given data set.
 	 *
 	 * @param string $location The name of the location.
-	 * @param array $data The entire location/hours data set
+	 * @param array  $data The entire location/hours data set
 	 *
 	 * @return array|WP_Error The hours for the given location, or an error if none could be found.
 	 *
