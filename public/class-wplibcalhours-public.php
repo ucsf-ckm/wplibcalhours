@@ -59,8 +59,8 @@ class WpLibCalHours_Public {
 	 *
 	 * @since    1.0.0
 	 *
-	 * @param      string $plugin_name The name of the plugin.
-	 * @param      string $version The version of this plugin.
+	 * @param      string               $plugin_name The name of the plugin.
+	 * @param      string               $version The version of this plugin.
 	 * @param      WpLibCalHours_Client $client The LibCal API client.
 	 */
 	public function __construct( $plugin_name, $version, WpLibCalHours_Client $client ) {
@@ -146,43 +146,60 @@ class WpLibCalHours_Public {
 	 */
 	public function wplibcalhours_sc( $attrs = array() ) {
 
-		$attrs       = array_change_key_case( $attrs, CASE_LOWER );
-		$attrs       = shortcode_atts( [
-			'location'    => '',
-			'num_weeks'   => self::DEFAULT_NUM_WEEKS
+		$attrs     = array_change_key_case( $attrs, CASE_LOWER );
+		$attrs     = shortcode_atts( [
+			'location'  => '',
+			'num_weeks' => self::DEFAULT_NUM_WEEKS
 		], $attrs );
-		$num_weeks   = (int) $attrs['num_weeks'];
+		$num_weeks = (int) $attrs['num_weeks'];
 		if ( $num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS ) {
 			$num_weeks = self::DEFAULT_NUM_WEEKS;
 		}
 		$num_days = $num_weeks * 7;
 
 		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
-		$return       = $this->client->getHours( $attrs['location'], $ignore_cache );
-		if ( is_wp_error( $return ) ) {
-			error_log( $return->get_error_message() );
-
-			return '';
+		$data         = [];
+		try {
+			$data = $this->client->getHours( $attrs['location'], $ignore_cache );
+			$data = $this->extract_hours( $data['weeks'] );
+		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
 		}
 
-		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $num_days );
-		if ( is_wp_error( $return ) ) {
-			error_log( $return->get_error_message() );
+		// calculate the start date (this should either be today, or the Monday of this week).
+		$now = current_time( 'timestamp' );
 
-			return '';
+		$today      = date_create()->setTimestamp( $now );
+		$start_date = clone $today;
+
+		$days = array();
+		for ( $i = 0; $i < $num_days; $i ++ ) {
+			$date = clone $start_date;
+			$date->add( new \DateInterval( "P${i}D" ) );
+			$key = $date->format( 'Y-m-d' );
+			$day = array( 'date' => $date, 'text' => '' );
+			if ( array_key_exists( $key, $data ) ) {
+				$day['text'] = $data[ $key ];
+			} else {
+				$day['text'] = __( 'n/a', 'wplibcalhours' );
+			}
+			$day['is_today'] = $key === $today->format( 'Y-m-d' );
+			$days[]          = $day;
 		}
 
 		$o = '<table class="wplibcalhours">';
 		$o .= '<thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
 		$o .= '<tbody>';
-		for ( $i = 0, $n = count( $return ); $i < $n; $i ++ ) {
-			$day = $return[ $i ];
+		for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
+			$day = $days[ $i ];
 			if ( $i && ! ( $i % 7 ) ) {
 				$o .= '</tbody><tbody class="hidden">';
 			}
-			$o .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $day['date']->format( 'l' ) . '</td>';
-			$o .= '<td>' . $day['date']->format( 'M j' ) . '</td>';
-			$o .= '<td>' . $day['text'] . '</td></tr>';
+			/* @var \DateTime $date */
+			$date = $day['date'];
+			$o    .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $date->format( 'l' ) . '</td>';
+			$o    .= '<td>' . $date->format( 'M j' ) . '</td>';
+			$o    .= '<td>' . $day['text'] . '</td></tr>';
 		}
 		$o .= '</tbody>';
 
@@ -194,25 +211,23 @@ class WpLibCalHours_Public {
 		}
 		$o .= '</table>';
 
-
 		return $o;
 	}
 
 	/**
-	 * Extracts and massages opening hours from a given list of opening hours as returned from the API.
+	 * Extracts opening hours from a given list of opening hours as returned from the API.
 	 *
 	 * @param array $weeks_raw_data An array of nested arrays, each one containing the opening hours for an entire week.
-	 * @param int $num_days Starting from the beginning of this week, how many days should be returned.
 	 *
-	 * @return array|WP_Error The list of opening hours, keyed off by their date ('YYYY-MM-DD').
+	 * @return array The list of opening hours, keyed off by their date ('YYYY-MM-DD').
+	 *
+	 * @throws \Exception
 	 *
 	 * @since 1.0.0
 	 */
-	protected function preprocess_location_hours_for_output( array $weeks_raw_data, $num_days = 7 ) {
+	protected function extract_hours( array $weeks_raw_data ) {
 		if ( empty( $weeks_raw_data ) ) {
-			return new WP_Error( $this->plugin_name . '_empty_data',
-				__( 'Retrieved data is empty.', 'wplibcalhours' )
-			);
+			throw new \Exception( __( 'Retrieved data is empty.', 'wplibcalhours' ) );
 		}
 
 		$all_days_raw = array();
@@ -244,27 +259,7 @@ class WpLibCalHours_Public {
 			}
 		}
 
-		// calculate the start date (this should either be today, or the Monday of this week).
-		$now = current_time( 'timestamp' );
-
-		$today      = date_create()->setTimestamp( $now );
-		$start_date = clone $today;
-
-		$filtered_days = array();
-		for ( $i = 0; $i < $num_days; $i ++ ) {
-			$date = clone $start_date;
-			$date->add( new \DateInterval( "P${i}D" ) );
-			$key          = $date->format( 'Y-m-d' );
-			$filtered_day = array( 'date' => $date, 'text' => '' );
-			if ( array_key_exists( $key, $days ) ) {
-				$filtered_day['text'] = $days[ $key ];
-			} else {
-				$filtered_day['text'] = __( 'n/a', 'wplibcalhours' );
-			}
-			$filtered_day['is_today'] = $key === $today->format( 'Y-m-d' );
-			$filtered_days[]          = $filtered_day;
-		}
-
-		return $filtered_days;
+		return $days;
 	}
+
 }

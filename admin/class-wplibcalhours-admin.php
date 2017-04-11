@@ -140,7 +140,7 @@ class WpLibCalHours_Admin {
 	/**
 	 * Filter-callback function that adds links to the list of links displayed on the plugins page.
 	 *
-	 * @param array $actions array List of existing links.
+	 * @param array  $actions array List of existing links.
 	 * @param string $foo
 	 *
 	 * @return array The updated list of links.
@@ -166,6 +166,6 @@ class WpLibCalHours_Admin {
 	 * @since 1.0.0
 	 */
 	public function update_option_ignore_cache() {
-		delete_transient( WpLibCalHours::CACHE_KEY );
+		delete_transient( $this->plugin_name . '_data' );
 	}
 }
