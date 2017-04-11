@@ -16,7 +16,7 @@
  * Plugin Name:       LibCal Hours for WordPress
  * Plugin URI:        https://github.com/ucsf-ckm/wplibcalhours
  * Description:       Embed LibCal hours for a given location into contents via short-code.
- * Version:           0.9.3
+ * Version:           1.0.0
  * Author:            Stefan Topfstedt
  * Author URI:        https://github.com/stopfstedt
  * License:           MIT
