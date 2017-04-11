@@ -28,6 +28,12 @@ The short code has the following configuration options.
 - `location` ... The name of the location that you want to display opening hours for. *(mandatory)*  
 - `num_weeks` ... The number of weeks of opening hours to display. Accepted values are `1`, `2` and `3`. Defaults to `3`. *(optional)*.
 
+### Examples
+
+`[wplibcalhours location="Parnassus Library"]` - This will print the opening hours for the "Parnassus Library" location for the next three weeks (starting today).
+
+`[wplibcalhours location="Parnassus Library" num_weeks=1]` - Prints the opening hours for the "Parnassus Library" for the next week (starting today).
+
 ## Styling
 
 Please see this [Wiki page](https://github.com/ucsf-ckm/wplibcalhours/wiki/Styling-The-Output) for ideas on how to customize the styles of this plugin's generated markup.
