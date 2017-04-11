@@ -71,9 +71,11 @@ class WpLibCalHours_Client {
 	 * @param string  $location The name of the location.
 	 * @param boolean $ignore_cache Set to TRUE to bypass cache.
 	 *
-	 * @return array|WP_Error
+	 * @return array
 	 *
-	 * @since    1.0.0
+	 * @throws \Exception
+	 *
+	 * @since 1.0.0
 	 */
 	public function getHours( $location, $ignore_cache = false ) {
 		$data          = false;
@@ -83,9 +85,6 @@ class WpLibCalHours_Client {
 		}
 		if ( false === $data ) {
 			$data = $this->fetchHoursFromAPI();
-			if ( is_wp_error( $data ) ) {
-				return $data;
-			}
 			if ( ! $ignore_cache ) {
 				$transient_timeout = 60 * 4; // 4 hours
 				set_transient( $transient_key, $data, $transient_timeout );
@@ -97,28 +96,28 @@ class WpLibCalHours_Client {
 
 	/**
 	 * Fetches hours-data from the LibCal Hours API.
+	 *
+	 * @return array The retrieved data.
+	 *
+	 * @throws \Exception
+	 *
 	 * @since 1.0.0
-	 * @access protected
-	 * @return array|WP_Error The retrieved data or an error.
 	 */
 	protected function fetchHoursFromAPI() {
 
 		if ( '' === trim( $this->url ) ) {
-			return new WP_Error( $this->plugin_name . '_missing_api_url',
-				__( 'No LibCal API endpoint has been configured.', 'wplibcalhours' )
-			);
+			throw new \Exception( __( 'No LibCal API endpoint has been configured.', 'wplibcalhours' ) );
 		}
+
 		$response = wp_remote_get( $this->url );
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			throw new \Exception( $response->get_error_message() );
 		}
+
 		$payload = wp_remote_retrieve_body( $response );
 		$data    = json_decode( $payload, true );
-		if ( false === $data ) {
-			return new WP_Error( $this->plugin_name . '_invalid_json',
-				__( 'Unable to JSON-decode the payload retrieved from API endpoint', 'wplibcalhours' ),
-				array( $this->url, $payload, json_last_error() )
-			);
+		if ( ! is_array( $data ) ) {
+			throw new \Exception( __( 'Unable to JSON-decode the payload retrieved from API endpoint', 'wplibcalhours' ) );
 		}
 
 		return $data;
@@ -128,9 +127,11 @@ class WpLibCalHours_Client {
 	 * Extracts the hours for a given location from the given data set.
 	 *
 	 * @param string $location The name of the location.
-	 * @param array  $data The entire location/hours data set
+	 * @param array  $data The entire location/hours data set.
 	 *
-	 * @return array|WP_Error The hours for the given location, or an error if none could be found.
+	 * @return array The hours for the given location.
+	 *
+	 * @throws \Exception
 	 *
 	 * @since 1.0.0
 	 */
@@ -141,12 +142,13 @@ class WpLibCalHours_Client {
 				return ( $location_data['name'] === $location );
 			} ) );
 		if ( empty( $location_data ) ) {
-			return new WP_Error( $this->plugin_name . '_unknown_location',
-				__( 'The requested location does not exist in LibCal data.', 'wplibcalhours' ),
-				array( $location, $data )
-			);
+			throw new \Exception( __( 'The requested location does not exist in LibCal data.', 'wplibcalhours' ) );
 		}
 		$location_data = $location_data[0];
+
+		if ( ! array_key_exists( 'weeks', $location_data ) ) {
+			throw new \Exception( __( 'No weeks found for location', 'wplibcalhours' ) );
+		}
 
 		return $location_data;
 	}
