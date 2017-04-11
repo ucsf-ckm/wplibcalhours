@@ -47,6 +47,15 @@ class WpLibCalHours {
 	const CACHE_EXPIRATION = 60 * 4; // 4 hours
 
 	/**
+	 * The unique identifier of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 * @var      string PLUGIN_NAME The string used to uniquely identify this plugin.
+	 */
+	const PLUGIN_NAME = 'wplibcalhours';
+
+	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
@@ -64,15 +73,6 @@ class WpLibCalHours {
 	 * @var      WpLibCalHours_Client $client The LibCal API client.
 	 */
 	protected $client;
-
-	/**
-	 * The unique identifier of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string $plugin_name The string used to uniquely identify this plugin.
-	 */
-	protected $plugin_name;
 
 	/**
 	 * The base name of the plugin.
@@ -103,8 +103,7 @@ class WpLibCalHours {
 	 */
 	public function __construct() {
 
-		$this->plugin_name     = 'wplibcalhours';
-		$this->plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_name . '.php' );
+		$this->plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . self::PLUGIN_NAME . '.php' );
 		$this->version         = '1.0.0';
 
 		$this->load_dependencies();
@@ -161,7 +160,7 @@ class WpLibCalHours {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wplibcalhours-client.php';
 
 		$this->loader = new WpLibCalHours_Loader();
-		$this->client = new WpLibCalHours_Client( $this->plugin_name, $this->version );
+		$this->client = new WpLibCalHours_Client( self::PLUGIN_NAME, $this->version );
 
 	}
 
@@ -191,11 +190,11 @@ class WpLibCalHours {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new WpLibCalHours_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new WpLibCalHours_Admin( self::PLUGIN_NAME, $this->get_version() );
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_setting' );
-		$this->loader->add_action( 'update_option_' . $this->plugin_name . '_ignore_cache', $plugin_admin, 'update_option_ignore_cache', null, 0 );
+		$this->loader->add_action( 'update_option_' . self::PLUGIN_NAME . '_ignore_cache', $plugin_admin, 'update_option_ignore_cache', null, 0 );
 		$this->loader->add_filter( 'plugin_action_links_' . $this->plugin_basename, $plugin_admin, 'add_action_links' );
 	}
 
@@ -208,7 +207,7 @@ class WpLibCalHours {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new WpLibCalHours_Public( $this->get_plugin_name(),
+		$plugin_public = new WpLibCalHours_Public( self::PLUGIN_NAME,
 			$this->get_version(),
 			$this->get_client() );
 
@@ -224,17 +223,6 @@ class WpLibCalHours {
 	 */
 	public function run() {
 		$this->loader->run();
-	}
-
-	/**
-	 * The name of the plugin used to uniquely identify it within the context of
-	 * WordPress and to define internationalization functionality.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The name of the plugin.
-	 */
-	public function get_plugin_name() {
-		return $this->plugin_name;
 	}
 
 	/**
