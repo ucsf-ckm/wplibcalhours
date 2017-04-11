@@ -165,7 +165,7 @@ class WpLibCalHours_Public {
 			return '';
 		}
 
-		$return = $this->preprocess_location_hours_for_output( $return['weeks'], $num_days );
+		$return = $this->extract_hours( $return['weeks'], $num_days );
 		if ( is_wp_error( $return ) ) {
 			error_log( $return->get_error_message() );
 
@@ -208,7 +208,7 @@ class WpLibCalHours_Public {
 	 *
 	 * @since 1.0.0
 	 */
-	protected function preprocess_location_hours_for_output( array $weeks_raw_data, $num_days = 7 ) {
+	protected function extract_hours( array $weeks_raw_data, $num_days = 7 ) {
 		if ( empty( $weeks_raw_data ) ) {
 			return new WP_Error( $this->plugin_name . '_empty_data',
 				__( 'Retrieved data is empty.', 'wplibcalhours' )
