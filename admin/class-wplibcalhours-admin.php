@@ -141,7 +141,6 @@ class WpLibCalHours_Admin {
 	 * Filter-callback function that adds links to the list of links displayed on the plugins page.
 	 *
 	 * @param array  $actions array List of existing links.
-	 * @param string $foo
 	 *
 	 * @return array The updated list of links.
 	 *
@@ -149,7 +148,7 @@ class WpLibCalHours_Admin {
 	 *
 	 * @since 1.0.0
 	 */
-	public function add_action_links( $actions, $foo ) {
+	public function add_action_links( $actions ) {
 		$settings = '<a href="' . esc_attr( get_admin_url( null,
 				'options-general.php?page=wplibcalhours' ) ) . '">' . __( 'Settings', 'General' ) . '</a>';
 		array_unshift( $actions, $settings );
