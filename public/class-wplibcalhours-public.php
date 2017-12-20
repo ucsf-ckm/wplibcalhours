@@ -59,8 +59,8 @@ class WpLibCalHours_Public {
 	 *
 	 * @since    1.0.0
 	 *
-	 * @param      string               $plugin_name The name of the plugin.
-	 * @param      string               $version The version of this plugin.
+	 * @param      string $plugin_name The name of the plugin.
+	 * @param      string $version The version of this plugin.
 	 * @param      WpLibCalHours_Client $client The LibCal API client.
 	 */
 	public function __construct( $plugin_name, $version, WpLibCalHours_Client $client ) {
@@ -262,4 +262,19 @@ class WpLibCalHours_Public {
 		return $days;
 	}
 
+	/**
+	 * Sends a JSON-formatted response of all library location timetables.
+	 *
+	 * @since 1.1.0
+	 */
+	public function api() {
+		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
+		$data         = [];
+		try {
+			$data = $this->client->getRawData( $ignore_cache );
+		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
+		}
+		wp_send_json( $data );
+	}
 }

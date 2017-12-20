@@ -68,7 +68,7 @@ class WpLibCalHours_Client {
 	/**
 	 * Returns the hours from a given location.
 	 *
-	 * @param string  $location The name of the location.
+	 * @param string $location The name of the location.
 	 * @param boolean $ignore_cache Set to TRUE to bypass cache.
 	 *
 	 * @return array
@@ -78,6 +78,23 @@ class WpLibCalHours_Client {
 	 * @since 1.0.0
 	 */
 	public function getHours( $location, $ignore_cache = false ) {
+		$data = $this->getRawData( $ignore_cache );
+
+		return $this->extractTimetableForLocation( $location, $data );
+	}
+
+	/**
+	 * Returns the raw data as consumed from the LibCal API.
+	 *
+	 * @param bool $ignore_cache Set to TRUE to bypass cache.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception
+	 *
+	 * @since 1.1.0
+	 */
+	public function getRawData( $ignore_cache = false ) {
 		$data          = false;
 		$transient_key = $this->plugin_name . '_data';
 		if ( ! $ignore_cache ) {
@@ -91,7 +108,7 @@ class WpLibCalHours_Client {
 			}
 		}
 
-		return $this->extractTimetableForLocation( $location, $data );
+		return $data;
 	}
 
 	/**
@@ -127,7 +144,7 @@ class WpLibCalHours_Client {
 	 * Extracts the hours for a given location from the given data set.
 	 *
 	 * @param string $location The name of the location.
-	 * @param array  $data The entire location/hours data set.
+	 * @param array $data The entire location/hours data set.
 	 *
 	 * @return array The hours for the given location.
 	 *
@@ -138,7 +155,7 @@ class WpLibCalHours_Client {
 	protected function extractTimetableForLocation( $location, array $data ) {
 		$locations_data = $data['locations'];
 		$location_data  = array_values( array_filter( $locations_data,
-			function ( $location_data ) use ( $location ) {
+			function( $location_data ) use ( $location ) {
 				return ( $location_data['name'] === $location );
 			} ) );
 		if ( empty( $location_data ) ) {

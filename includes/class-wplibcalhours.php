@@ -178,7 +178,8 @@ class WpLibCalHours {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_setting' );
-		$this->loader->add_action( 'update_option_' . self::PLUGIN_NAME . '_ignore_cache', $plugin_admin, 'update_option_ignore_cache', null, 0 );
+		$this->loader->add_action( 'update_option_' . self::PLUGIN_NAME . '_ignore_cache', $plugin_admin,
+			'update_option_ignore_cache', null, 0 );
 		$this->loader->add_filter( 'plugin_action_links_' . $this->plugin_basename, $plugin_admin, 'add_action_links' );
 	}
 
@@ -198,6 +199,9 @@ class WpLibCalHours {
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_ajax_wplibcalhours', $plugin_public, 'api' );
+		$this->loader->add_action( 'wp_ajax_nopriv_wplibcalhours', $plugin_public, 'api' );
+
 	}
 
 	/**
