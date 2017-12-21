@@ -282,7 +282,7 @@ class WpLibCalHours_Public {
 					}
 					$rhett[ $location['name'] ][] = [
 						'day'  => date( 'D', strtotime( $date ) ),
-						'date' => date( 'M j' ),
+						'date' => date( 'M j', strtotime( $date ) ),
 						'text' => $hours,
 					];
 
