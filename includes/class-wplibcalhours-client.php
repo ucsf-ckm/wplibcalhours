@@ -155,7 +155,7 @@ class WpLibCalHours_Client {
 	protected function extractTimetableForLocation( $location, array $data ) {
 		$locations_data = $data['locations'];
 		$location_data  = array_values( array_filter( $locations_data,
-			function( $location_data ) use ( $location ) {
+			function ( $location_data ) use ( $location ) {
 				return ( $location_data['name'] === $location );
 			} ) );
 		if ( empty( $location_data ) ) {
