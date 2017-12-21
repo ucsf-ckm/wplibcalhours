@@ -269,12 +269,29 @@ class WpLibCalHours_Public {
 	 */
 	public function api() {
 		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
-		$data         = [];
+		$now          = date( 'Y-m-d' );
 		try {
-			$data = $this->client->getRawData( $ignore_cache );
+			$data  = $this->client->getRawData( $ignore_cache );
+			$rhett = [];
+			foreach ( $data['locations'] as $location ) {
+				$rhett[ $location['name'] ] = [];
+				$timetable                  = $this->extract_hours( $location['weeks'] );
+				foreach ( $timetable as $date => $hours ) {
+					if ( strcmp( $now, $date ) > 0 ) {
+						continue;
+					}
+					$rhett[ $location['name'] ][] = [
+						'day'  => date( 'D', strtotime( $date ) ),
+						'date' => date( 'M j' ),
+						'text' => $hours,
+					];
+
+				}
+
+			}
 		} catch ( \Exception $e ) {
 			error_log( $e->getMessage() );
 		}
-		wp_send_json( $data );
+		wp_send_json( $rhett );
 	}
 }
