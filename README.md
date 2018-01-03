@@ -49,7 +49,7 @@ Each list starts with the current date.
 
 Three locations, the current date is January 3rd.
 
-```json
+```javascript
 {
   "Parnassus Library": [
     {
@@ -62,7 +62,7 @@ Three locations, the current date is January 3rd.
       "date": "Jan 4",
       "text": "7:45am - 10pm"
     }
-    //...
+    /* ... */
   ],
   "Mission Bay Library": [
     {
@@ -75,7 +75,7 @@ Three locations, the current date is January 3rd.
       "date": "Jan 4",
       "text": "9am - 6pm"
     }
-    // ...
+    /* ... */
   ],
   "Mission Bay Hub": [
     {
@@ -88,7 +88,7 @@ Three locations, the current date is January 3rd.
       "date": "Jan 4",
       "text": "24 hours"
     }
-    // ...
+    /* ... */
   ]
 }
 ```
