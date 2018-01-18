@@ -87,7 +87,7 @@ class WpLibCalHours {
 	public function __construct() {
 
 		$this->plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . self::PLUGIN_NAME . '.php' );
-		$this->version         = '1.1.0';
+		$this->version         = '1.1.1';
 
 		$this->load_dependencies();
 		$this->set_locale();
