@@ -269,7 +269,8 @@ class WpLibCalHours_Public {
 	 */
 	public function api() {
 		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
-		$now          = date( 'Y-m-d' );
+		$timestamp    = current_time( 'timestamp' );
+		$now          = date('Y-m-d', $timestamp);
 		try {
 			$data  = $this->client->getRawData( $ignore_cache );
 			$rhett = [];
