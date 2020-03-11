@@ -247,12 +247,14 @@ class WpLibCalHours_Public {
 						$text = __( 'closed', 'wplibcalhours' );
 						break;
 					default:
-						if ( array_key_exists( 'hours', $day_raw['times'] )
-						     && ! empty( $day_raw['times']['hours'] )
-						     && array_key_exists( 'from', $day_raw['times']['hours'][0] )
-						     && array_key_exists( 'to', $day_raw['times']['hours'][0] )
-						) {
-							$text = $day_raw['times']['hours'][0]['from'] . ' - ' . $day_raw['times']['hours'][0]['to'];
+						if ( array_key_exists( 'hours', $day_raw['times'] )  && ! empty( $day_raw['times']['hours'] )) {
+							$hours_text = [];
+							foreach( $day_raw['times']['hours'] as $hours ) {
+								if (array_key_exists( 'from', $hours ) && array_key_exists( 'to', $hours )) {
+									$hours_text[] = $hours['from'] . ' - ' . $hours['to'];
+								}
+							}
+							$text = implode( '<br>', $hours_text );
 						}
 				}
 				$days[ $day_raw['date'] ] = $text;
