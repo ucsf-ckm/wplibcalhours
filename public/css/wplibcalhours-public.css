@@ -13,3 +13,7 @@
 .wplibcalhours .next {
     float: right;
 }
+
+.wplibcalhours tbody td {
+    vertical-align: top;
+}
