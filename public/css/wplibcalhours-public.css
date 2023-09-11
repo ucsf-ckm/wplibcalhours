@@ -23,7 +23,14 @@
     grid-auto-flow: column;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, 1fr);
+    margin-top: 0 !important;
 }
+
+.hours-list-view-block {
+    padding-left: 0;
+    padding-top: 15px;
+}
+
 .hours-list-view li {
     display: inline-flex;
     width: 200px;
@@ -37,17 +44,41 @@
     text-transform: capitalize;
 }
 
+.hours-display {
+    display: inline-flex;
+}
+
+.hours-display-block {
+    display: block;
+}
+
 .circle {
     width: 10px;
     height: 10px;
-    background: red;
     border-radius: 50px;
+    margin-right: 5px;
+}
+
+.circle-red {
+    background: #721c24;
+}
+
+.circle-green {
+    background: #155724;
+}
+
+.open-text {
+    text-transform: uppercase;
+    font-size: .8rem;
+    font-weight: bold;
+    margin-right:5px
 }
 
 .open-indicator {
     display: inline-flex;
     align-items: baseline;
     text-transform: capitalize;
+    width: 140px;
 }
 
 @media (max-width: 576px) {

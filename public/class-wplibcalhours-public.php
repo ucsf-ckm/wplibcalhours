@@ -66,7 +66,7 @@ class WpLibCalHours_Public {
 	 * @param      string $version The version of this plugin.
 	 * @param      WpLibCalHours_Client $client The LibCal API client.
 	 */
-	public function __construct( $plugin_name, $version, WpLibCalHours_Client $client ) {
+	public function __construct($plugin_name, $version, WpLibCalHours_Client $client) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -92,11 +92,11 @@ class WpLibCalHours_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name,
-			plugin_dir_url( __FILE__ ) . 'css/wplibcalhours-public.css',
+		wp_enqueue_style($this->plugin_name,
+			plugin_dir_url(__FILE__) . 'css/wplibcalhours-public.css',
 			array(),
 			$this->version,
-			'all' );
+			'all');
 
 	}
 
@@ -119,11 +119,11 @@ class WpLibCalHours_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name,
-			plugin_dir_url( __FILE__ ) . 'js/wplibcalhours-public.js',
-			array( 'jquery' ),
+		wp_enqueue_script($this->plugin_name,
+			plugin_dir_url(__FILE__) . 'js/wplibcalhours-public.js',
+			array('jquery'),
 			$this->version,
-			false );
+			false);
 
 	}
 
@@ -133,8 +133,7 @@ class WpLibCalHours_Public {
 	 * @since 1.0.0
 	 */
 	public function register_shortcodes() {
-
-		add_shortcode( 'wplibcalhours', array( $this, 'wplibcalhours_sc' ) );
+		add_shortcode('wplibcalhours', [$this, 'wplibcalhours_sc']);
 	}
 
 	/**
@@ -147,99 +146,66 @@ class WpLibCalHours_Public {
 	 * @since 1.0.0
 	 *
 	 */
-	public function wplibcalhours_sc( $attrs = array() ) {
-
-		$attrs     = array_change_key_case( $attrs, CASE_LOWER );
-		$attrs     = shortcode_atts( [
+	public function wplibcalhours_sc($attrs = array()) {
+		$attrs     = array_change_key_case($attrs, CASE_LOWER);
+		$attrs     = shortcode_atts([
 			'location'  => '',
-			'display_type' => 'block',
+			'display_type' => 'grid',
 			'num_weeks' => self::DEFAULT_NUM_WEEKS
-		], $attrs );
+		], $attrs);
+
 		$num_weeks = (int) $attrs['num_weeks'];
-		if ( $num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS ) {
+		if ($num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS) {
 			$num_weeks = self::DEFAULT_NUM_WEEKS;
 		}
 		$num_days = $num_weeks * 7;
 
-		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
-		$data         = [];
-		try {
-			$data = $this->client->getHours( $attrs['location'], $ignore_cache );
-			$data = $this->extract_hours( $data['weeks'] );
-		} catch ( \Exception $e ) {
-			error_log( $e->getMessage() );
+		$ignore_cache = (boolean) get_option('wplibcalhours_ignore_cache');
+
+        $data = [];
+        try {
+			$data = $this->client->getHours($attrs['location'], $ignore_cache);
+			$data = $this->extract_hours($data['weeks']);
+		} catch (\Exception $e) {
+			error_log($e->getMessage());
 		}
 
-		// calculate the start date (this should either be today, or the Monday of this week).
-		$now = current_time( 'timestamp' );
-
-		$today      = date_create()->setTimestamp( $now );
-		$start_date = clone $today;
-
-		$days = [];
-		for ( $i = 0; $i < $num_days; $i ++ ) {
-			$date = clone $start_date;
-			$date->add( new \DateInterval( "P${i}D" ) );
-			$key = $date->format( 'Y-m-d' );
-			$day = array( 'date' => $date, 'text' => '' );
-			if ( array_key_exists( $key, $data ) ) {
-				$day['text'] = $data[ $key ];
-			} else {
-				$day['text'] = __( 'n/a', 'wplibcalhours' );
-			}
-
-			$day['is_today'] = $key === $today->format( 'Y-m-d' );
-			$days[]          = $day;
-		}
-
+		$days = $this->setDays($num_days, $data);
+        ob_start();
 		if ($attrs['display_type'] == 'table') {
-			$o = '<table class="wplibcalhours">';
-			$o .= '<thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
-			$o .= '<tbody>';
-			for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
-				$day = $days[ $i ];
-				if ( $i && ! ( $i % 7 ) ) {
-					$o .= '</tbody><tbody class="hidden">';
-				}
-				/* @var \DateTime $date */
-				$date = $day['date'];
-				$o    .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $date->format( 'D' ) . '</td>';
-				$o    .= '<td>' . $date->format( 'M j' ) . '</td>';
-				$o    .= '<td>' . $day['text'] . '</td></tr>';
-			}
-			$o .= '</tbody>';
-
-			if ( 1 < $num_weeks ) {
-				$o .= '<tfoot><tr><td colspan="3">';
-				$o .= '<a class="prev hidden">&laquo; ' . __( 'previous', 'wplibcalhours' ) . '</a>';
-				$o .= '<a class="next">' . __( 'next', 'wplibcalhours' ) . ' &raquo;</a>';
-				$o .= '</td></tr></tfoot>';
-			}
-			$o .= '</table>';
+			require_once 'partials/table.php';
 		} else {
-			$o = '<div class="open-indicator">';
-			$o .= '<div class="circle"></div>';
-			$o .= '<div>' . $days[array_key_first($days)]['text']['status'] . $this->openUntil($days[array_key_first($days)]) . '</div>';
-			$o .= '</div>';
-			$o .= '<ul class="hours-list-view">';
-			for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
-				$day = $days[ $i ];
-				$today = $day['is_today'];
-
-				/* @var \DateTime $date */
-				$date = $day['date'];
-				$day_text = ($today) ? 'Today' : $date->format( 'D' );
-				$o .= '<li' . ( $today ? ' class="today" ' : '' ) . '>';
-                $o .= '<div class="hours-day">' . $day_text . '</div><div class="hours-text"> ' . $this->hoursText($day) . '</div>';
-				$o .= '</li>';
-			}
-
-			$o .= '</ul>';
+		    require_once 'partials/grid.php';
 		}
-
-		return $o;
+        return ob_get_clean();
 	}
 
+    /**
+     * Formats the date information returned from LibCal
+     * @param $num_days
+     * @param $data
+     * @return array
+     */
+    private function setDays($num_days, $data) {
+        // calculate the start date (this should either be today, or the Monday of this week).
+        $now = current_time('timestamp');
+        $today = date_create()->setTimestamp($now);
+        $start_date = clone $today;
+
+        $days = [];
+        for ($i = 0; $i < $num_days; $i ++) {
+            $date = clone $start_date;
+            $date->add(new \DateInterval("P${i}D"));
+            $key = $date->format('Y-m-d');
+
+            $day = array('date' => $date);
+            $day['text'] = (array_key_exists($key, $data)) ? $data[$key] : __('n/a', 'wplibcalhours');
+            $day['is_today'] = $key === $today->format('Y-m-d');
+            $days[] = $day;
+        }
+
+        return $days;
+    }
 	/**
 	 * Extracts opening hours from a given list of opening hours as returned from the API.
 	 *
@@ -251,58 +217,67 @@ class WpLibCalHours_Public {
 	 *
 	 * @since 1.0.0
 	 */
-	protected function extract_hours( array $weeks_raw_data ) {
-		if ( empty( $weeks_raw_data ) ) {
-			throw new \Exception( __( 'Retrieved data is empty.', 'wplibcalhours' ) );
+	protected function extract_hours(array $weeks_raw_data) {
+		if (empty($weeks_raw_data)) {
+			throw new \Exception(__('Retrieved data is empty.', 'wplibcalhours'));
 		}
 
 		$all_days_raw = array();
-		foreach ( $weeks_raw_data as $week_raw ) {
-			$all_days_raw = array_merge( $all_days_raw, array_values( $week_raw ) );
+		foreach ($weeks_raw_data as $week_raw) {
+			$all_days_raw = array_merge($all_days_raw, array_values($week_raw));
 		}
 
 		$days = [];
-		foreach ( $all_days_raw as $day_raw ) {
-			if ( array_key_exists( 'times', $day_raw ) && array_key_exists( 'date', $day_raw ) ) {
-				$text = __( 'n/a', 'wplibcalhours' );
-				switch ( $day_raw['times']['status'] ) {
+		foreach ($all_days_raw as $day_raw) {
+			if (array_key_exists('times', $day_raw) && array_key_exists('date', $day_raw)) {
+				$text = __('n/a', 'wplibcalhours');
+				switch ($day_raw['times']['status']) {
 					case '24hours':
-						$text = __( '24 hours', 'wplibcalhours' );
+						$text = __('24 hours', 'wplibcalhours');
 						break;
 					case 'closed':
-						$text = __( 'closed', 'wplibcalhours' );
+						$text = __('closed', 'wplibcalhours');
 						break;
 					default:
-						if ( array_key_exists( 'hours', $day_raw['times'] )  && ! empty( $day_raw['times']['hours'] )) {
+						if (array_key_exists('hours', $day_raw['times'])  && ! empty($day_raw['times']['hours'])) {
 							$hours_text = [];
-							foreach( $day_raw['times']['hours'] as $hours ) {
-								if (array_key_exists( 'from', $hours ) && array_key_exists( 'to', $hours )) {
+							foreach($day_raw['times']['hours'] as $hours) {
+								if (array_key_exists('from', $hours) && array_key_exists('to', $hours)) {
 									$hours_text[] = $hours['from'] . ' - ' . $hours['to'];
 								}
 							}
-							$text = implode( '<br>', $hours_text );
+							$text = implode('<br>', $hours_text);
 						}
 				}
 
-                $days[$day_raw['date']] = ['hours' => $text, 'status' => $day_raw['times']['status']];
+				$days[$day_raw['date']] = ['hours' => $text, 'status' => $day_raw['times']['status']];
 			}
 		}
 
 		return $days;
 	}
 
-    public function hoursText($day) {
-        return is_array($day['text']) ? $day['text']['hours'] : $day['text'];
-    }
+    /**
+     * @param $day
+     * @return mixed
+     */
+	public function hoursText($day) {
+		return is_array($day['text']) ? $day['text']['hours'] : $day['text'];
+	}
 
-    #[Pure] public function openUntil($day) {
-        $hours_text = $this->hoursText($day);
-        $hours = preg_split('/-/', $hours_text);
-        if (sizeof($hours) == 1) {
-            return $hours[0];
-        }
-        return 'Until ' . trim($hours[1]);
-    }
+    /**
+     * Formats open until time
+     * @param $day
+     * @return mixed|string
+     */
+	#[Pure] public function openUntil($day) {
+		$hours_text = $this->hoursText($day);
+		$hours = preg_split('/-/', $hours_text);
+		if (sizeof($hours) == 1) {
+			return $hours[0];
+		}
+		return 'Until ' . trim($hours[1]);
+	}
 
 	/**
 	 * Sends a JSON-formatted response of all library location timetables.
@@ -310,31 +285,31 @@ class WpLibCalHours_Public {
 	 * @since 1.1.0
 	 */
 	public function api() {
-		$ignore_cache = (boolean) get_option( 'wplibcalhours_ignore_cache' );
-		$timestamp    = current_time( 'timestamp' );
+		$ignore_cache = (boolean) get_option('wplibcalhours_ignore_cache');
+		$timestamp    = current_time('timestamp');
 		$now          = date('Y-m-d', $timestamp);
 		try {
-			$data  = $this->client->getRawData( $ignore_cache );
+			$data  = $this->client->getRawData($ignore_cache);
 			$rhett = [];
-			foreach ( $data['locations'] as $location ) {
+			foreach ($data['locations'] as $location) {
 				$rhett[ $location['name'] ] = [];
-				$timetable                  = $this->extract_hours( $location['weeks'] );
-				foreach ( $timetable as $date => $hours ) {
-					if ( strcmp( $now, $date ) > 0 ) {
+				$timetable                  = $this->extract_hours($location['weeks']);
+				foreach ($timetable as $date => $hours) {
+					if (strcmp($now, $date) > 0) {
 						continue;
 					}
 					$rhett[ $location['name'] ][] = [
-						'day'  => date( 'D', strtotime( $date ) ),
-						'date' => date( 'M j', strtotime( $date ) ),
+						'day'  => date('D', strtotime($date)),
+						'date' => date('M j', strtotime($date)),
 						'text' => $hours,
 					];
 
 				}
 
 			}
-		} catch ( \Exception $e ) {
-			error_log( $e->getMessage() );
+		} catch (\Exception $e) {
+			error_log($e->getMessage());
 		}
-		wp_send_json( $rhett );
+		wp_send_json($rhett);
 	}
 }
