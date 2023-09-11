@@ -10,6 +10,8 @@
  * @subpackage WpLibCalHours/public
  */
 
+use JetBrains\PhpStorm\Pure;
+
 /**
  * The public-facing functionality of the plugin.
  *
@@ -19,6 +21,7 @@
  * @package    WpLibCalHours
  * @subpackage WpLibCalHours/public
  * @author     Stefan Topfstedt <stefan.topfstedt@ucsf.edu>
+ * @author     Dean Farrell <lfarrell@email.unc.edu>
  */
 class WpLibCalHours_Public {
 
@@ -149,7 +152,7 @@ class WpLibCalHours_Public {
 		$attrs     = array_change_key_case( $attrs, CASE_LOWER );
 		$attrs     = shortcode_atts( [
 			'location'  => '',
-            'display_type' => 'block',
+			'display_type' => 'block',
 			'num_weeks' => self::DEFAULT_NUM_WEEKS
 		], $attrs );
 		$num_weeks = (int) $attrs['num_weeks'];
@@ -184,14 +187,54 @@ class WpLibCalHours_Public {
 			} else {
 				$day['text'] = __( 'n/a', 'wplibcalhours' );
 			}
+
 			$day['is_today'] = $key === $today->format( 'Y-m-d' );
 			$days[]          = $day;
 		}
 
 		if ($attrs['display_type'] == 'table') {
-			require_once 'partials/table.php';
+			$o = '<table class="wplibcalhours">';
+			$o .= '<thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
+			$o .= '<tbody>';
+			for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
+				$day = $days[ $i ];
+				if ( $i && ! ( $i % 7 ) ) {
+					$o .= '</tbody><tbody class="hidden">';
+				}
+				/* @var \DateTime $date */
+				$date = $day['date'];
+				$o    .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $date->format( 'D' ) . '</td>';
+				$o    .= '<td>' . $date->format( 'M j' ) . '</td>';
+				$o    .= '<td>' . $day['text'] . '</td></tr>';
+			}
+			$o .= '</tbody>';
+
+			if ( 1 < $num_weeks ) {
+				$o .= '<tfoot><tr><td colspan="3">';
+				$o .= '<a class="prev hidden">&laquo; ' . __( 'previous', 'wplibcalhours' ) . '</a>';
+				$o .= '<a class="next">' . __( 'next', 'wplibcalhours' ) . ' &raquo;</a>';
+				$o .= '</td></tr></tfoot>';
+			}
+			$o .= '</table>';
 		} else {
-			require_once 'partials/block.php';
+			$o = '<div class="open-indicator">';
+			$o .= '<div class="circle"></div>';
+			$o .= '<div>' . $days[array_key_first($days)]['text']['status'] . $this->openUntil($days[array_key_first($days)]) . '</div>';
+			$o .= '</div>';
+			$o .= '<ul class="hours-list-view">';
+			for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
+				$day = $days[ $i ];
+				$today = $day['is_today'];
+
+				/* @var \DateTime $date */
+				$date = $day['date'];
+				$day_text = ($today) ? 'Today' : $date->format( 'D' );
+				$o .= '<li' . ( $today ? ' class="today" ' : '' ) . '>';
+                $o .= '<div class="hours-day">' . $day_text . '</div><div class="hours-text"> ' . $this->hoursText($day) . '</div>';
+				$o .= '</li>';
+			}
+
+			$o .= '</ul>';
 		}
 
 		return $o;
@@ -218,7 +261,7 @@ class WpLibCalHours_Public {
 			$all_days_raw = array_merge( $all_days_raw, array_values( $week_raw ) );
 		}
 
-		$days = array();
+		$days = [];
 		foreach ( $all_days_raw as $day_raw ) {
 			if ( array_key_exists( 'times', $day_raw ) && array_key_exists( 'date', $day_raw ) ) {
 				$text = __( 'n/a', 'wplibcalhours' );
@@ -240,12 +283,26 @@ class WpLibCalHours_Public {
 							$text = implode( '<br>', $hours_text );
 						}
 				}
-				$days[ $day_raw['date'] ] = $text;
+
+                $days[$day_raw['date']] = ['hours' => $text, 'status' => $day_raw['times']['status']];
 			}
 		}
 
 		return $days;
 	}
+
+    public function hoursText($day) {
+        return is_array($day['text']) ? $day['text']['hours'] : $day['text'];
+    }
+
+    #[Pure] public function openUntil($day) {
+        $hours_text = $this->hoursText($day);
+        $hours = preg_split('/-/', $hours_text);
+        if (sizeof($hours) == 1) {
+            return $hours[0];
+        }
+        return 'Until ' . trim($hours[1]);
+    }
 
 	/**
 	 * Sends a JSON-formatted response of all library location timetables.

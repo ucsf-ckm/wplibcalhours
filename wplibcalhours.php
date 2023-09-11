@@ -8,22 +8,24 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://github.com/ucsf-ckm/wplibcalhours
+ * @link              https://github.com/UNC-Libraries/wplibcalhours
  * @since             1.0.0
  * @package           WpLibCalHours
  *
  * @wordpress-plugin
- * Plugin Name:       LibCal Hours for WordPress
- * Plugin URI:        https://github.com/ucsf-ckm/wplibcalhours
+ * Plugin Name:       UNC LibCal Hours for WordPress
+ * Plugin URI:        https://github.com/UNC-Libraries/wplibcalhours
  * Description:       Embed LibCal hours for a given location into contents via short-code.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Author:            Stefan Topfstedt
  * Author URI:        https://github.com/stopfstedt
+ * Author:            Dean Farrell
+ * Author URI:        https://github.com/lfarrell
  * License:           MIT
  * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       wplibcalhours
  * Domain Path:       /languages
- * GitHub Plugin URI: https://github.com/ucsf-ckm/wplibcalhours
+ * GitHub Plugin URI: https://github.com/UNC-Libraries/wplibcalhours
  */
 
 // If this file is called directly, abort.

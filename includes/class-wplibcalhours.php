@@ -26,6 +26,7 @@
  * @package    WpLibCalHours
  * @subpackage WpLibCalHours/includes
  * @author     Stefan Topfstedt <stefan.topfstedt@ucsf.edu>
+ * @author     Dean Farrell <lfarrell@email.unc.edu>
  */
 class WpLibCalHours {
 

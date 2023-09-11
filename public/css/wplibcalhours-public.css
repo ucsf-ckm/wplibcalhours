@@ -21,12 +21,33 @@
 .hours-list-view {
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: .6fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, 1fr);
 }
-
+.hours-list-view li {
+    display: inline-flex;
+    width: 200px;
+}
 .hours-day {
-    font-weight: bold
+    font-weight: bold;
+    width: 28%;
+}
+
+.hours-text {
+    text-transform: capitalize;
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50px;
+}
+
+.open-indicator {
+    display: inline-flex;
+    align-items: baseline;
+    text-transform: capitalize;
 }
 
 @media (max-width: 576px) {
