@@ -29,7 +29,7 @@ class WpLibCalHours_Public {
 	 * @access public
 	 * @var int DEFAULT_NUM_WEEKS The default number of weeks to display.
 	 */
-	const DEFAULT_NUM_WEEKS = 3;
+	const DEFAULT_NUM_WEEKS = 5;
 
 	/**
 	 * The ID of this plugin.
@@ -149,6 +149,7 @@ class WpLibCalHours_Public {
 		$attrs     = array_change_key_case( $attrs, CASE_LOWER );
 		$attrs     = shortcode_atts( [
 			'location'  => '',
+            'display_type' => 'block',
 			'num_weeks' => self::DEFAULT_NUM_WEEKS
 		], $attrs );
 		$num_weeks = (int) $attrs['num_weeks'];
@@ -172,7 +173,7 @@ class WpLibCalHours_Public {
 		$today      = date_create()->setTimestamp( $now );
 		$start_date = clone $today;
 
-		$days = array();
+		$days = [];
 		for ( $i = 0; $i < $num_days; $i ++ ) {
 			$date = clone $start_date;
 			$date->add( new \DateInterval( "P${i}D" ) );
@@ -187,29 +188,11 @@ class WpLibCalHours_Public {
 			$days[]          = $day;
 		}
 
-		$o = '<table class="wplibcalhours">';
-		$o .= '<thead><tr><th colspan="3">' . __( 'Hours', 'wplibcalhours' ) . '</th></tr></thead>';
-		$o .= '<tbody>';
-		for ( $i = 0, $n = count( $days ); $i < $n; $i ++ ) {
-			$day = $days[ $i ];
-			if ( $i && ! ( $i % 7 ) ) {
-				$o .= '</tbody><tbody class="hidden">';
-			}
-			/* @var \DateTime $date */
-			$date = $day['date'];
-			$o    .= '<tr' . ( $day['is_today'] ? ' class="today" ' : '' ) . '><td>' . $date->format( 'l' ) . '</td>';
-			$o    .= '<td>' . $date->format( 'M j' ) . '</td>';
-			$o    .= '<td>' . $day['text'] . '</td></tr>';
+		if ($attrs['display_type'] == 'table') {
+			require_once 'partials/table.php';
+		} else {
+			require_once 'partials/block.php';
 		}
-		$o .= '</tbody>';
-
-		if ( 1 < $num_weeks ) {
-			$o .= '<tfoot><tr><td colspan="3">';
-			$o .= '<a class="prev hidden">&laquo; ' . __( 'previous', 'wplibcalhours' ) . '</a>';
-			$o .= '<a class="next">' . __( 'next', 'wplibcalhours' ) . ' &raquo;</a>';
-			$o .= '</td></tr></tfoot>';
-		}
-		$o .= '</table>';
 
 		return $o;
 	}

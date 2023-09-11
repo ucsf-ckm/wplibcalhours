@@ -17,3 +17,20 @@
 .wplibcalhours tbody td {
     vertical-align: top;
 }
+
+.hours-list-view {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: .6fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+}
+
+.hours-day {
+    font-weight: bold
+}
+
+@media (max-width: 576px) {
+    .hours-list-view {
+        display: block;
+    }
+}
