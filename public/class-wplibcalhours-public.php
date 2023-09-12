@@ -148,6 +148,9 @@ class WpLibCalHours_Public {
 	 */
 	public function wplibcalhours_sc($attrs = array()) {
 		$attrs     = array_change_key_case($attrs, CASE_LOWER);
+		/*
+		 * display_type options 'table', 'grid', 'block
+		 */
 		$attrs     = shortcode_atts([
 			'location'  => '',
 			'display_type' => 'grid',
@@ -161,51 +164,55 @@ class WpLibCalHours_Public {
 		$num_days = $num_weeks * 7;
 
 		$ignore_cache = (boolean) get_option('wplibcalhours_ignore_cache');
+		$location = strip_tags($attrs['location']);
 
-        $data = [];
-        try {
-			$data = $this->client->getHours($attrs['location'], $ignore_cache);
+		$data = [];
+
+		try {
+			$data = $this->client->getHours($location, $ignore_cache);
 			$data = $this->extract_hours($data['weeks']);
 		} catch (\Exception $e) {
 			error_log($e->getMessage());
 		}
 
 		$days = $this->setDays($num_days, $data);
-        ob_start();
+		ob_start();
 		if ($attrs['display_type'] == 'table') {
 			require_once 'partials/table.php';
+		} elseif ($attrs['display_type'] == 'stacked') {
+			require_once 'partials/stacked.php';
 		} else {
-		    require_once 'partials/grid.php';
+			require_once 'partials/grid.php';
 		}
-        return ob_get_clean();
+		return ob_get_clean();
 	}
 
-    /**
-     * Formats the date information returned from LibCal
-     * @param $num_days
-     * @param $data
-     * @return array
-     */
-    private function setDays($num_days, $data) {
-        // calculate the start date (this should either be today, or the Monday of this week).
-        $now = current_time('timestamp');
-        $today = date_create()->setTimestamp($now);
-        $start_date = clone $today;
+	/**
+	 * Formats the date information returned from LibCal
+	 * @param $num_days
+	 * @param $data
+	 * @return array
+	 */
+	private function setDays($num_days, $data) {
+		// calculate the start date (this should either be today, or the Monday of this week).
+		$now = current_time('timestamp');
+		$today = date_create()->setTimestamp($now);
+		$start_date = clone $today;
 
-        $days = [];
-        for ($i = 0; $i < $num_days; $i ++) {
-            $date = clone $start_date;
-            $date->add(new \DateInterval("P${i}D"));
-            $key = $date->format('Y-m-d');
+		$days = [];
+		for ($i = 0; $i < $num_days; $i ++) {
+			$date = clone $start_date;
+			$date->add(new \DateInterval("P${i}D"));
+			$key = $date->format('Y-m-d');
 
-            $day = array('date' => $date);
-            $day['text'] = (array_key_exists($key, $data)) ? $data[$key] : __('n/a', 'wplibcalhours');
-            $day['is_today'] = $key === $today->format('Y-m-d');
-            $days[] = $day;
-        }
+			$day = array('date' => $date);
+			$day['text'] = (array_key_exists($key, $data)) ? $data[$key] : __('n/a', 'wplibcalhours');
+			$day['is_today'] = $key === $today->format('Y-m-d');
+			$days[] = $day;
+		}
 
-        return $days;
-    }
+		return $days;
+	}
 	/**
 	 * Extracts opening hours from a given list of opening hours as returned from the API.
 	 *
@@ -250,33 +257,11 @@ class WpLibCalHours_Public {
 						}
 				}
 
-				$days[$day_raw['date']] = ['hours' => $text, 'status' => $day_raw['times']['status']];
+				$days[$day_raw['date']] = ['hours' => $text, 'status' => $this->currentlyOpen($day_raw['times'])];
 			}
 		}
 
 		return $days;
-	}
-
-    /**
-     * @param $day
-     * @return mixed
-     */
-	public function hoursText($day) {
-		return is_array($day['text']) ? $day['text']['hours'] : $day['text'];
-	}
-
-    /**
-     * Formats open until time
-     * @param $day
-     * @return mixed|string
-     */
-	#[Pure] public function openUntil($day) {
-		$hours_text = $this->hoursText($day);
-		$hours = preg_split('/-/', $hours_text);
-		if (sizeof($hours) == 1) {
-			return $hours[0];
-		}
-		return 'Until ' . trim($hours[1]);
 	}
 
 	/**
@@ -311,5 +296,46 @@ class WpLibCalHours_Public {
 			error_log($e->getMessage());
 		}
 		wp_send_json($rhett);
+	}
+
+	/**
+	 * UNC additions
+	 */
+
+	/**
+	 * Set open status
+	 * @param $day_info
+	 * @return string
+	 */
+	public function currentlyOpen($day_info): string
+	{
+		if (array_key_exists('currently_open', $day_info) && $day_info['currently_open'] == 1) {
+			return 'open';
+		}
+		return 'closed';
+	}
+
+	/**
+	 * @param $day
+	 * @return mixed
+	 */
+	public function hoursText($day): mixed
+	{
+		return is_array($day['text']) ? $day['text']['hours'] : $day['text'];
+	}
+
+	/**
+	 * Formats open until time
+	 * @param $day
+	 * @return mixed|string
+	 */
+	#[Pure] public function openUntil($day): mixed
+	{
+		$hours_text = $this->hoursText($day);
+		$hours = preg_split('/-/', $hours_text);
+		if (sizeof($hours) == 1) {
+			return $hours[0];
+		}
+		return 'Until ' . trim($hours[1]);
 	}
 }
