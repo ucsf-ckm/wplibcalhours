@@ -125,6 +125,12 @@ class WpLibCalHours_Public {
 			$this->version,
 			false);
 
+        wp_enqueue_script($this->plugin_name . '-grid',
+            plugin_dir_url(__FILE__) . 'js/grid.js',
+            [],
+            $this->version,
+            ['in_footer' => true, 'strategy'  => 'defer']);
+
 	}
 
 	/**
@@ -336,4 +342,36 @@ class WpLibCalHours_Public {
 		}
 		return 'Until ' . trim($hours[1]);
 	}
+
+    public function setToday($today): string
+    {
+        return ($today) ? 'class="today"' : '';
+    }
+
+    public function weekBlocks($days): array
+    {
+        if (sizeof($days) > 7) {
+            return array_chunk($days, 7);
+        }
+        return $days;
+    }
+
+    public function setClassList($stacked, $week_number): string
+    {
+        $classes = [];
+        if ($stacked) {
+            $classes[] = 'hours-list-view-stacked';
+        }
+
+        if (empty($classes)) {
+            return '';
+        }
+        return ' ' . implode(' ', $classes);
+    }
+
+    public function getBaseLocation($location): string
+    {
+        $location_parts = preg_split('/\s+/', $location);
+        return strtolower(trim($location_parts[0]));
+    }
 }

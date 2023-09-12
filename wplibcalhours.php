@@ -16,11 +16,9 @@
  * Plugin Name:       UNC LibCal Hours for WordPress
  * Plugin URI:        https://github.com/UNC-Libraries/wplibcalhours
  * Description:       Embed LibCal hours for a given location into contents via short-code.
- * Version:           1.2.1
- * Author:            Stefan Topfstedt
- * Author URI:        https://github.com/stopfstedt
- * Author:            Dean Farrell
- * Author URI:        https://github.com/lfarrell
+ * Version:           1.3.0
+ * Author:            Stefan Topfstedt and Dean Farrell
+ * Author URI:        https://github.com/UNC-Libraries
  * License:           MIT
  * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       wplibcalhours

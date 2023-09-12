@@ -53,9 +53,29 @@
     display: block;
 }
 
+.open {
+    max-height: 1500px;
+    overflow-y: hidden;
+    transition: max-height 1s ease-in-out;
+}
+
+.closed {
+    max-height: 0;
+    overflow-y: hidden;
+    transition: max-height 1s ease-in-out;
+}
+
 .hours-display-stacked h2 {
     font-size: 2rem;
     text-align: left;
+}
+
+.hours-more button {
+    float: right;
+    border-radius: 5px;
+    padding: 8px 10px;
+    color: white;
+    min-width: 130px;
 }
 
 .circle {
