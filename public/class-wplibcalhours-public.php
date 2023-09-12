@@ -179,8 +179,6 @@ class WpLibCalHours_Public {
 		ob_start();
 		if ($attrs['display_type'] == 'table') {
 			require_once 'partials/table.php';
-		} elseif ($attrs['display_type'] == 'stacked') {
-			require_once 'partials/stacked.php';
 		} else {
 			require_once 'partials/grid.php';
 		}

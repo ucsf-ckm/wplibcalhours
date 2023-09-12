@@ -27,7 +27,7 @@
     margin-top: 0 !important;
 }
 
-.hours-list-view-block {
+.hours-list-view-stacked {
     padding-left: 0 !important;
     padding-top: 15px !important;
 }
@@ -49,11 +49,11 @@
     display: inline-flex;
 }
 
-.hours-display-block {
+.hours-display-stacked {
     display: block;
 }
 
-.hours-display-block h2 {
+.hours-display-stacked h2 {
     font-size: 2rem;
     text-align: left;
 }
