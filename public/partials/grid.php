@@ -38,7 +38,11 @@ $base_location = $this->getBaseLocation($location);
                 $day_text = ($today) ? 'Today' : $date->format('D'); ?>
 
                 <li <?php echo $this->setToday($today) ?>>
+        <?php if ($key > 0): ?>
+            <div class="hours-day"><?php echo $date->format( 'M j' )  ?></div>
+        <?php else: ?>
                     <div class="hours-day"><?php echo $day_text ?></div>
+                   <?php endif ?>
                     <div class="hours-text"><?php echo $this->hoursText($day) ?></div>
                 </li>
             <?php endfor ?>

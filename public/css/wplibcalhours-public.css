@@ -38,7 +38,7 @@
 }
 .hours-day {
     font-weight: bold;
-    width: 28%;
+    min-width: 35%;
 }
 
 .hours-text {
