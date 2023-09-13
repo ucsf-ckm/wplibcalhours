@@ -19,15 +19,19 @@ $base_location = $this->getBaseLocation($location);
             endif ?>
         </div>
     </div>
-    <?php $chunked_weeks = $this->weekBlocks($days) ?>
+    <?php $chunked_weeks = $this->weekBlocks($days); ?>
 
     <?php foreach ($chunked_weeks as $key => $chunked_week): ?>
         <?php if ($key == 1): // Add wrapper div around hidden hours ?>
             <div class="closed">
         <?php endif ?>
-        <ul id="hours-display-<?php echo $key ?>" aria-hidden="<?php echo ($key > 0) ? 'true' : 'false' ?>"
-            class="hours-list-view <?php echo $this->setClassList($stacked, $key) ?>">
+        <ul aria-hidden="<?php echo ($key > 0) ? 'true' : 'false' ?>"
+            class="hours-list-view <?php echo $this->setClassList($stacked) ?>">
             <?php for ($i = 0, $n = count($chunked_week); $i < $n; $i ++):
+                if ($today_only && $i > 0) { // Only show first day
+                    break;
+                }
+
                 $day = $chunked_week[$i];
                 $today = $day['is_today'];
                 $date = $day['date'];
@@ -39,7 +43,7 @@ $base_location = $this->getBaseLocation($location);
                 </li>
             <?php endfor ?>
         </ul>
-        <?php if ($key == array_key_last($chunked_weeks)): // Close wrapper div around hidden hours ?>
+        <?php if ($key > 0 && $key == array_key_last($chunked_weeks)): // Close wrapper div around hidden hours ?>
         </div>
         <?php endif ?>
     <?php endforeach ?>

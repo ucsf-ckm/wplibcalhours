@@ -125,11 +125,11 @@ class WpLibCalHours_Public {
 			$this->version,
 			false);
 
-        wp_enqueue_script($this->plugin_name . '-grid',
-            plugin_dir_url(__FILE__) . 'js/grid.js',
-            [],
-            $this->version,
-            ['in_footer' => true, 'strategy'  => 'defer']);
+		wp_enqueue_script($this->plugin_name . '-grid',
+			plugin_dir_url(__FILE__) . 'js/grid.js',
+			[],
+			$this->version,
+			['in_footer' => true, 'strategy'  => 'defer']);
 
 	}
 
@@ -160,13 +160,20 @@ class WpLibCalHours_Public {
 		$attrs     = shortcode_atts([
 			'location'  => '',
 			'display_type' => 'grid',
+			'today_only' => false,
 			'num_weeks' => self::DEFAULT_NUM_WEEKS
 		], $attrs);
 
 		$num_weeks = (int) $attrs['num_weeks'];
+
+		$today_only = $attrs['today_only'] == 'true';
+		if ($today_only) {
+			$num_weeks = 1;
+		}
 		if ($num_weeks < 1 || $num_weeks > self::DEFAULT_NUM_WEEKS) {
 			$num_weeks = self::DEFAULT_NUM_WEEKS;
 		}
+
 		$num_days = $num_weeks * 7;
 
 		$ignore_cache = (boolean) get_option('wplibcalhours_ignore_cache');
@@ -233,7 +240,7 @@ class WpLibCalHours_Public {
 			throw new \Exception(__('Retrieved data is empty.', 'wplibcalhours'));
 		}
 
-		$all_days_raw = array();
+		$all_days_raw = [];
 		foreach ($weeks_raw_data as $week_raw) {
 			$all_days_raw = array_merge($all_days_raw, array_values($week_raw));
 		}
@@ -343,35 +350,24 @@ class WpLibCalHours_Public {
 		return 'Until ' . trim($hours[1]);
 	}
 
-    public function setToday($today): string
-    {
-        return ($today) ? 'class="today"' : '';
-    }
+	public function setToday($today): string
+	{
+		return ($today) ? 'class="today"' : '';
+	}
 
-    public function weekBlocks($days): array
-    {
-        if (sizeof($days) > 7) {
-            return array_chunk($days, 7);
-        }
-        return $days;
-    }
+	public function weekBlocks($days): array
+	{
+		return array_chunk($days, 7);
+	}
 
-    public function setClassList($stacked, $week_number): string
-    {
-        $classes = [];
-        if ($stacked) {
-            $classes[] = 'hours-list-view-stacked';
-        }
+	public function setClassList($stacked): string
+	{
+		return ($stacked) ? 'hours-list-view-stacked' : '';
+	}
 
-        if (empty($classes)) {
-            return '';
-        }
-        return ' ' . implode(' ', $classes);
-    }
-
-    public function getBaseLocation($location): string
-    {
-        $location_parts = preg_split('/\s+/', $location);
-        return strtolower(trim($location_parts[0]));
-    }
+	public function getBaseLocation($location): string
+	{
+		$location_parts = preg_split('/\s+/', $location);
+		return strtolower(trim($location_parts[0]));
+	}
 }
