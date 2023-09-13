@@ -2,7 +2,17 @@
 
 Embed opening hours for any given location from LibCal into WordPress via short codes.
 
-![Opening hours displayed in a published post](assets/screenshot-1.png)
+### Table View
+![Opening hours displayed in a table](assets/screenshot-1.png)
+
+### Grid View
+![Opening hours displayed as a grid](assets/grid-view-multiple-weeks.png)
+
+### Stacked View
+![Opening hours displayed as a grid](assets/stacked-view-multiple-weeks.png)
+
+### Today Only View
+![Opening hours displayed as a grid](assets/today-only-view.png)
 
 ## Installation
 
@@ -25,14 +35,22 @@ Embed the `[wplibcalhours]` short code into your posts and pages.
 
 The short code has the following configuration options.
 
-- `location` ... The name of the location that you want to display opening hours for. *(mandatory)*  
-- `num_weeks` ... The number of weeks of opening hours to display. Accepted values are `1`, `2` and `3`. Defaults to `3`. *(optional)*.
+- `location` ... The name of the location that you want to display opening hours for. *(mandatory)*
+- `display_type` ... The layout of hours information. Options are `table`, `grid` and `stacked`. Defaults to `grid`. *(optional)*
+- `num_weeks` ... The number of weeks of opening hours to display. Accepted values are `1`, `2` and `3`. Defaults to `3`. *(optional)*
+- `today_only` ... Show hours for the current day only. Note if this is set to `true` it supersedes the `num_week` option. Defaults to `false`. *(optional)*
 
 ### Examples
 
 `[wplibcalhours location="Parnassus Library"]` - This will print the opening hours for the "Parnassus Library" location for the next three weeks (starting today).
 
 `[wplibcalhours location="Parnassus Library" num_weeks=1]` - Prints the opening hours for the "Parnassus Library" for the next week (starting today).
+
+`[wplibcalhours location="Art (Sloane) Library" display_type="grid"]` - Prints the opening hours for the "Art" in a grid layout (starting today).
+
+`[wplibcalhours location="Art (Sloane) Library" display_type="stacked"]` - Prints the opening hours for the "Art Library" in a stacked layout (starting today).
+
+`[wplibcalhours location="Art (Sloane) Library" today_only=true]` - Prints the opening hours for the "Art Library" for today.
 
 ## API
 
