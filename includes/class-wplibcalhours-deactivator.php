@@ -14,23 +14,17 @@
  * Fired during plugin deactivation.
  *
  * This class defines all code necessary to run during the plugin's deactivation.
- *
- * @since      1.0.0
  * @package    WpLibCalHours
  * @subpackage WpLibCalHours/includes
  * @author     Stefan Topfstedt <stefan.topfstedt@ucsf.edu>
  */
 class WpLibCalHours_Deactivator {
-
-	/**
-	 * Deactivation callback.
-	 *
-	 * Clears out any transient data that may have been set by this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
-		delete_transient( 'wplibcalhours_data' );
-	}
-
+    /**
+     * Deactivation callback.
+     *
+     * Clears out any transient data that may have been set by this plugin.
+     */
+    public static function deactivate() {
+        delete_transient( 'wplibcalhours_data' );
+    }
 }

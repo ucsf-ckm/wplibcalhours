@@ -27,8 +27,8 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if (! defined('WPINC')) {
+    die;
 }
 
 /**
@@ -36,17 +36,17 @@ if ( ! defined( 'WPINC' ) ) {
  * This action is documented in includes/class-wplibcalhours-deactivator.php
  */
 function deactivate_wplibcalhours() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-wplibcalhours-deactivator.php';
-	WpLibCalHours_Deactivator::deactivate();
+    require_once plugin_dir_path(__FILE__) . 'includes/class-wplibcalhours-deactivator.php';
+    WpLibCalHours_Deactivator::deactivate();
 }
 
-register_deactivation_hook( __FILE__, 'deactivate_wplibcalhours' );
+register_deactivation_hook(__FILE__, 'deactivate_wplibcalhours');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-wplibcalhours.php';
+require plugin_dir_path(__FILE__) . 'includes/class-wplibcalhours.php';
 
 /**
  * Begins execution of the plugin.
@@ -54,14 +54,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-wplibcalhours.php';
  * Since everything within the plugin is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
- *
- * @since    1.0.0
  */
 function run_wplibcalhours() {
-
-	$plugin = new WpLibCalHours();
-	$plugin->run();
-
+    $plugin = new WpLibCalHours();
+    $plugin->run();
 }
 
 run_wplibcalhours();
