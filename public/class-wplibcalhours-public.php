@@ -111,7 +111,7 @@ class WpLibCalHours_Public {
             plugin_dir_url(__FILE__) . 'js/grid.js',
             [],
             $this->version,
-            ['in_footer' => true, 'strategy'  => 'defer']);
+            ['in_footer' => true, 'strategy' => 'defer']);
     }
 
     /**
@@ -168,10 +168,11 @@ class WpLibCalHours_Public {
         $days = $this->setDays($num_days, $data);
         ob_start();
         if ($attrs['display_type'] == 'table') {
-            require_once 'partials/table.php';
+            require 'partials/table.php';
         } else {
-            require_once 'partials/grid.php';
+            require 'partials/grid.php';
         }
+
         return ob_get_clean();
     }
 
@@ -274,9 +275,7 @@ class WpLibCalHours_Public {
                         'date' => date('M j', strtotime($date)),
                         'text' => $hours,
                     ];
-
                 }
-
             }
         } catch (\Exception $e) {
             error_log($e->getMessage());
