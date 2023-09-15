@@ -15,7 +15,7 @@
         <tr<?php $day['is_today'] ? ' class="today"' : '' ?>>
             <td><?php echo $date->format( 'l' ) ?></td>
             <td><?php echo $date->format( 'M j' ) ?></td>
-            <td><?php echo $day['text'] ?></td>
+            <td><?php echo $day['text']['hours'] ?></td>
         </tr>
     <?php endfor ?>
     </tbody>
