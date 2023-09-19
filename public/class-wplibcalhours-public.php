@@ -138,9 +138,11 @@ class WpLibCalHours_Public {
             'location'  => '',
             'display_type' => 'grid',
             'today_only' => false,
+            'show_status_icon' => true,
             'num_weeks' => self::DEFAULT_NUM_WEEKS
         ], $attrs);
 
+        $show_status_icon = $attrs['show_status_icon'] == 'true';
         $num_weeks = (int) $attrs['num_weeks'];
 
         $today_only = $attrs['today_only'] == 'true';

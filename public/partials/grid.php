@@ -9,15 +9,19 @@ $base_location = $this->getBaseLocation($location);
         <?php if ($stacked): ?>
             <h2><?php echo $location ?> Hours</h2>
         <?php endif ?>
-        <div class="open-indicator">
-            <div class="circle <?php echo $open_class ?>"></div>
-            <div>
-                <span class="open-text"><?php echo $first_day ?></span>
-                <?php if ($first_day == 'open'):
-                    echo $this->openUntil($days[array_key_first($days)]);
-                endif ?>
+
+        <?php if ($show_status_icon): ?>
+            <div class="open-indicator">
+                <div class="circle <?php echo $open_class ?>"></div>
+                <div>
+                    <span class="open-text"><?php echo $first_day ?></span>
+                    <?php if ($first_day == 'open'):
+                        echo $this->openUntil($days[array_key_first($days)]);
+                    endif ?>
+                </div>
             </div>
-        </div>
+        <?php endif ?>
+
         <?php $chunked_weeks = $this->weekBlocks($days); ?>
 
         <?php foreach ($chunked_weeks as $week_number => $chunked_week): ?>

@@ -38,6 +38,7 @@ The short code has the following configuration options.
 - `location` ... The name of the location that you want to display opening hours for. *(mandatory)*
 - `display_type` ... The layout of hours information. Options are `table`, `grid` and `stacked`. Defaults to `grid`. *(optional)*
 - `num_weeks` ... The number of weeks of opening hours to display. Accepted values are `1`, `2` and `3`. Defaults to `3`. *(optional)*
+- `show_status_icon` ... Show status icon for whether a library is open. Defaults to `true`. *(optional)*
 - `today_only` ... Show hours for the current day only. Note if this is set to `true` it supersedes the `num_week` option. Defaults to `false`. *(optional)*
 
 ### Examples
@@ -52,6 +53,7 @@ The short code has the following configuration options.
 
 `[wplibcalhours location="Art (Sloane) Library" today_only=true]` - Prints the opening hours for the "Art Library" for today.
 
+`[wplibcalhours location="Art (Sloane) Library" today_only=true show_status_icon=false]` - Prints the opening hours for the "Art Library" for today without the open/closed status icon.
 ## API
 
 This plugin also exposes opening hours via a read-only, public API endpoint. 
