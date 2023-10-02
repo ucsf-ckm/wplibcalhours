@@ -17,3 +17,98 @@
 .wplibcalhours tbody td {
     vertical-align: top;
 }
+
+/* UNC additions */
+.hours-list-view {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    margin-top: 0 !important;
+}
+
+.hours-list-view-stacked {
+    padding-left: 0 !important;
+    padding-top: 15px !important;
+}
+
+.hours-list-view li {
+    display: inline-flex;
+    width: 185px;
+}
+.hours-day {
+    font-weight: bold;
+    min-width: 35%;
+}
+
+.hours-text {
+    text-transform: capitalize;
+}
+
+.hours-display {
+    display: inline-flex;
+}
+
+.hours-display-stacked {
+    display: block;
+}
+
+.open {
+    max-height: 1500px;
+    overflow-y: hidden;
+    transition: max-height 1s ease-in-out;
+}
+
+.closed {
+    max-height: 0;
+    overflow-y: hidden;
+    transition: max-height 1s ease-in-out;
+}
+
+.hours-display-stacked h2 {
+    font-size: 2rem;
+    text-align: left;
+}
+
+.hours-more button {
+    float: right;
+    border-radius: 5px;
+    padding: 8px 10px;
+    color: white;
+    min-width: 130px;
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50px;
+    margin-right: 5px;
+}
+
+.circle-red {
+    background: #D50101;
+}
+
+.circle-green {
+    background: #04865F;
+}
+
+.open-text {
+    text-transform: uppercase;
+    font-size: .8rem;
+    font-weight: bold;
+    margin-right:5px
+}
+
+.open-indicator {
+    display: inline-flex;
+    align-items: baseline;
+    text-transform: capitalize;
+    width: 140px;
+}
+
+@media (max-width: 576px) {
+    .hours-list-view {
+        display: block;
+    }
+}
