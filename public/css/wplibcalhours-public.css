@@ -25,6 +25,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, 1fr);
     margin-top: 0 !important;
+    padding-left: 10px;
 }
 
 .hours-list-view-stacked {
@@ -34,7 +35,8 @@
 
 .hours-list-view li {
     display: inline-flex;
-    width: 185px;
+    justify-content: flex-start;
+    width: 195px;
 }
 .hours-day {
     font-weight: bold;
